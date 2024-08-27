@@ -111,3 +111,6 @@ dist
 
 # Search index
 *.vsidx
+
+# outputs
+obj/
