@@ -1,0 +1,2 @@
+C:\MyData\Code\FirebotDropListCommand\obj\Debug\FirebotDropListCommand.njsproj.AssemblyReference.cache
+C:\MyData\Code\FirebotDropListCommand\obj\Debug\FirebotDropListCommand.njsproj.CoreCompileInputs.cache
