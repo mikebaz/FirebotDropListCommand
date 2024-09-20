@@ -69,7 +69,9 @@ const script: Firebot.CustomScript<Params> = {
                 if (thisCommand.sortTags) {
                     // this could be done with a map but I found this easier to understand
                     if (thisCommand.sortTags.indexOf(tagId) != -1) {
-                        dropCommands.push(thisCommand.trigger.replace('!', ''));
+                        if (!thisCommand.hidden) {
+                            dropCommands.push(thisCommand.trigger.replace('!', ''));
+                        }
                     }
                 }
             });
