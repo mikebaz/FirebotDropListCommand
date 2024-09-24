@@ -27,9 +27,9 @@ const script: Firebot.CustomScript<Params> = {
     getScriptManifest: () => {
         return {
             name: "Firebot Drop List Command",
-            description: "Finds all 'drops'-tagged commands and returns it in chat.",
+            description: "Finds all commands with a specific tag and returns it in chat.",
             author: "Michael C. Bazarewsky",
-            version: "1.0",
+            version: "1.1.1",
             firebotVersion: "5",
         };
     },
