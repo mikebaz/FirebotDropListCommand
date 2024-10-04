@@ -10,4 +10,7 @@
     <Folder Include="dist\" />
     <Folder Include="tests\" />
   </ItemGroup>
+  <ItemGroup>
+    <None Remove="src\copyToProfile.cmd" />
+  </ItemGroup>
 </Project>
