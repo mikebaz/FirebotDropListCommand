@@ -114,3 +114,6 @@ dist
 
 # outputs
 obj/
+
+# vs stuff
+.vs/
