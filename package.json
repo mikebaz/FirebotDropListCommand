@@ -5,7 +5,7 @@
   "description": "A custom command to list drops in a compact way.",
   "main": "",
   "scripts": {
-    "build": "webpack",
+    "build": "webpack && copy src\\copyToProfile.cmd dist",
     "build:dev": "npm run build && npm run copy",
     "copy": "node ./scripts/copy-build.js",
     "test": "jest"

@@ -3,6 +3,7 @@ import * as fs from "fs";
 import { Firebot, ScriptReturnObject } from "@crowbartools/firebot-custom-scripts-types";
 import { StringParameter } from "@crowbartools/firebot-custom-scripts-types/types/modules/firebot-parameters";
 import { Effects } from "@crowbartools/firebot-custom-scripts-types/types/effects";
+import { CommandDefinition } from "@crowbartools/firebot-custom-scripts-types/types/modules/command-manager";
 
 interface Params {
     tagName: StringParameter;
@@ -29,7 +30,7 @@ const script: Firebot.CustomScript<Params> = {
             name: "Firebot Drop List Command",
             description: "Finds all commands with a specific tag and returns it in chat.",
             author: "Michael C. Bazarewsky",
-            version: "1.1.1",
+            version: "2.0.0",
             firebotVersion: "5",
         };
     },
@@ -63,32 +64,32 @@ const script: Firebot.CustomScript<Params> = {
             let commands = runRequest.modules.commandManager.getAllCustomCommands();
             logger.debug("... Command count: ", commands.length);
 
-            // get the ones tagged as drops
-            const dropCommands: string[] = [];
+            // get the ones tagged with the requested tag
+            const taggedCommands: CommandDefinition[] = [];
             commands.forEach(function (thisCommand) {
                 if (thisCommand.sortTags) {
                     // this could be done with a map but I found this easier to understand
                     if (thisCommand.sortTags.indexOf(tagId) != -1) {
                         if (!thisCommand.hidden) {
-                            dropCommands.push(thisCommand.trigger.replace('!', ''));
+                            taggedCommands.push(thisCommand);
                         }
                     }
                 }
             });
-            logger.debug("... Found: ", dropCommands.length);
-            dropCommands.sort();
+            logger.debug("... Found: ", taggedCommands.length);
+            taggedCommands.sort((a, b) => a.trigger.localeCompare(b.trigger));
 
             // break it up to chunks as necessary
-            const chunkSize = 40;
-            const chunkedCommands = Array.from({ length: Math.ceil(dropCommands.length / chunkSize) }, (_, i) => dropCommands.slice(i * chunkSize, i * chunkSize + chunkSize));
+            const chunkSize = 30;
+            const chunkedCommands = Array.from({ length: Math.ceil(taggedCommands.length / chunkSize) }, (_, i) => taggedCommands.slice(i * chunkSize, i * chunkSize + chunkSize));
 
             // build the replies
-            var effects: Effects.Effect<Effects.KnownEffectType>[] = [];
-            var didFirst = false;
+            let effects: Effects.Effect<Effects.KnownEffectType>[] = [];
+            let didFirst = false;
 
             chunkedCommands.forEach(function (thisChunk) {
                 // the open message for the reply
-                var replyString = "";
+                let replyString = "";
                 if (!didFirst) {
                     replyString = `Commands tagged '${requestedTag}' for this channel are: `;
                     didFirst = true;
@@ -96,14 +97,29 @@ const script: Firebot.CustomScript<Params> = {
                     replyString = "(continued) ";
                 }
                 // the actual list
-                var needComma = false;
+                let needComma = false;
                 thisChunk.forEach(function (thisCommand) {
                     if (needComma) {
                         replyString += ", ";
                     } else {
                         needComma = true;
                     }
-                    replyString += thisCommand;
+                    replyString += thisCommand.trigger.replace('!', '');
+                    // @ts-expect-error
+                    const aliases: string[] = thisCommand.aliases ?? [];
+                    if (aliases.length > 0) {
+                        replyString += " (";
+                        let needAliasComma = false;
+                        aliases.forEach(function (thisAlias) {
+                            if (needAliasComma) {
+                                replyString += ", ";
+                            } else {
+                                needAliasComma = true;
+                            }
+                            replyString += thisAlias.replace('!', '');
+                        });
+                        replyString += ")";
+                    }
                 });
                 logger.debug("... ", replyString);
                 // the effect object
